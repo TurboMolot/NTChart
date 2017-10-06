@@ -210,6 +210,12 @@ public class SeriesLine implements ISeries<IPointLine> {
         }
     }
 
+    public void setLineWidth(float lineWidthPx) {
+        Paint lPaint = getLinePaint();
+        if(lPaint != null)
+            lPaint.setStrokeWidth(lineWidthPx);
+    }
+
     @Override
     public void setColor(@ColorInt int color) {
         synchronized (renderLock) {
@@ -317,6 +323,7 @@ public class SeriesLine implements ISeries<IPointLine> {
         holder.setMaxDistanceX(mdxy != null ? mdxy : 0);
         mdxy = maxDistanceY.get();
         holder.setMaxDistanceY(mdxy != null ? mdxy : 0);
+        holder.setReducePointsEnabled(isReducePointsEnabled());
         holder.calcRender(getPoints());
     }
 
@@ -361,11 +368,17 @@ public class SeriesLine implements ISeries<IPointLine> {
         return true;
     }
 
+    protected Paint getFillPaint(List<? extends IPointLine> ptsRender,
+                                 ISeriesHolder holder,
+                                 Map<ISeries, ISeriesHolder> holders) {
+        return getFillPaint();
+    }
+
     protected void renderFill(Canvas canvas,
                               List<? extends IPointLine> ptsRender,
                               ISeriesHolder holder,
                               Map<ISeries, ISeriesHolder> holders, Path fPath) {
-        Paint fPaint = getFillPaint();
+        Paint fPaint = getFillPaint(ptsRender, holder, holders);
         RectF wndSize = holder.getWindowSize();
         if (fPath == null
                 || fPaint == null

@@ -6,7 +6,6 @@ import android.content.Context;
 import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.graphics.SurfaceTexture;
-import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.Surface;
 import android.view.TextureView;
@@ -14,6 +13,8 @@ import android.view.TextureView;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
+import ru.turbomolot.ntchart.axis.AxisPosition;
+import ru.turbomolot.ntchart.axis.IAxis;
 import ru.turbomolot.ntchart.listener.NTTouchScaleMoveListener;
 import ru.turbomolot.ntchart.series.ISeries;
 import ru.turbomolot.ntchart.utils.ForegroundDetector;
@@ -53,7 +54,7 @@ public class NTChart extends TextureView implements TextureView.SurfaceTextureLi
         init(context, attrs);
     }
 
-    private void init(Context context, @Nullable AttributeSet attrs) {
+    private void init(Context context, AttributeSet attrs) {
         setOpaque(false);
         if (isInEditMode())
             return;
@@ -153,11 +154,15 @@ public class NTChart extends TextureView implements TextureView.SurfaceTextureLi
         ntChartHolder.applyMatrix(startPoint, matrix);
     }
 
-    protected boolean isShowFps() {
+    public boolean isShowFps() {
         return ntChartHolder.isShowFps();
     }
 
-    protected void setShowFps(boolean showFps) {
+    public void setShowFps(boolean showFps) {
         ntChartHolder.setShowFps(showFps);
+    }
+
+    protected IAxis getAxis(AxisPosition position) {
+        return ntChartHolder.getAxis(position);
     }
 }

@@ -412,4 +412,16 @@ public class NTChartHolder {
     protected void setShowFps(boolean showFps) {
         this.showFps.lazySet(showFps);
     }
+
+    protected IAxis getAxis(AxisPosition position) {
+        if(position == null)
+            return null;
+        synchronized (axisListLock) {
+            for (IAxis it : axisList) {
+                if(it.getPosition() == position)
+                    return it;
+            }
+        }
+        return null;
+    }
 }

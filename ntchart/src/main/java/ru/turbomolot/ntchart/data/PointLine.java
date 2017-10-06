@@ -1,10 +1,12 @@
 package ru.turbomolot.ntchart.data;
 
+import java.io.Serializable;
+
 /**
  * Created by TurboMolot on 04.10.17.
  */
 
-public class PointLine implements IPointLine {
+public class PointLine implements IPointLine, Serializable {
     private float x;
     private float y;
 
