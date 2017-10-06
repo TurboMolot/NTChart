@@ -268,9 +268,9 @@ public class NTChartHolder {
 
     protected RectF getWindowSizeAxis(ISeries series) {
         synchronized (axisListLock) {
-            RectF offsetRes = new RectF();
+            RectF offsetRes = new RectF(surfaceSize);
             for (IAxis it : axisList) {
-                if(it.isDependedSeries(series)) {
+                if(it.isDependedSeries(series) && it.isVisible()) {
                     RectF offset = it.getWindowSize();
                     offsetRes.top = Math.max(offset.top, offsetRes.top);
                     offsetRes.left = Math.max(offset.left, offsetRes.left);
