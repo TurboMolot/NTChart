@@ -162,7 +162,7 @@ public class NTChart extends TextureView implements TextureView.SurfaceTextureLi
         ntChartHolder.setShowFps(showFps);
     }
 
-    protected IAxis getAxis(AxisPosition position) {
+    public IAxis getAxis(AxisPosition position) {
         return ntChartHolder.getAxis(position);
     }
 }
