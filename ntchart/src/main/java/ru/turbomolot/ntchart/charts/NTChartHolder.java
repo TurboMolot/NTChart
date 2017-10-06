@@ -73,7 +73,9 @@ public class NTChartHolder {
 ////                renderFrame(seriesHolderMap);
 //                threadRenderInvoker.execute();
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                // skip
+            } catch (Exception ex) {
+                Log.w("[NTChartHolder]", ex);
             }
         }
     }, 1);
@@ -97,8 +99,6 @@ public class NTChartHolder {
 //            }
 //        }
 //    }, 1);
-
-
 
 
     public NTChartHolder(NTChart chart) {
@@ -270,7 +270,7 @@ public class NTChartHolder {
         synchronized (axisListLock) {
             RectF offsetRes = new RectF(surfaceSize);
             for (IAxis it : axisList) {
-                if(it.isDependedSeries(series) && it.isVisible()) {
+                if (it.isDependedSeries(series) && it.isVisible()) {
                     RectF offset = it.getWindowSize();
                     offsetRes.top = Math.max(offset.top, offsetRes.top);
                     offsetRes.left = Math.max(offset.left, offsetRes.left);
@@ -284,12 +284,12 @@ public class NTChartHolder {
 
     protected void updateAxisSizeAll() {
         NTChart chart = getChart();
-        if(chart == null)
+        if (chart == null)
             return;
         int val = ConverterUtil.convertDpToPixels(32, chart.getContext());
         synchronized (axisListLock) {
             for (IAxis it : axisList) {
-                if(!it.isWindowSizeManual()) {
+                if (!it.isWindowSizeManual()) {
                     synchronized (surfaceSizeLock) {
                         RectF size = new RectF(surfaceSize);
                         size.left += val;
@@ -315,7 +315,7 @@ public class NTChartHolder {
         if (series != null && (series.getWindowSize().isEmpty() || !series.isWindowSizeManual())) {
             RectF size = getWindowSizeAxis(series);
             synchronized (surfaceSizeLock) {
-                if(size.isEmpty())
+                if (size.isEmpty())
                     size = new RectF(surfaceSize);
                 series.setWindowSize(size.left, size.top, size.right, size.bottom, false);
             }
@@ -325,7 +325,7 @@ public class NTChartHolder {
     protected void setDependedSeries(ISeries series, AxisPosition position) {
         synchronized (axisListLock) {
             for (IAxis it : axisList) {
-                if(it.getPosition() == position) {
+                if (it.getPosition() == position) {
                     it.addDependsSeries(series);
                     break;
                 }
@@ -336,7 +336,7 @@ public class NTChartHolder {
     protected void removeDependedSeries(ISeries series, AxisPosition position) {
         synchronized (axisListLock) {
             for (IAxis it : axisList) {
-                if(it.getPosition() == position) {
+                if (it.getPosition() == position) {
                     it.removeDependsSeries(series);
                     break;
                 }
@@ -414,11 +414,11 @@ public class NTChartHolder {
     }
 
     protected IAxis getAxis(AxisPosition position) {
-        if(position == null)
+        if (position == null)
             return null;
         synchronized (axisListLock) {
             for (IAxis it : axisList) {
-                if(it.getPosition() == position)
+                if (it.getPosition() == position)
                     return it;
             }
         }

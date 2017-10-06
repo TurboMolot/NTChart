@@ -57,4 +57,9 @@ public class ThreadCalcParam {
             return null;
         }
     }
+    public void stop() {
+        if(!es.isShutdown() && !es.isTerminated()) {
+            es.shutdownNow();
+        }
+    }
 }

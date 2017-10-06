@@ -43,4 +43,10 @@ public class ThreadRenderInvoker {
     public void invokeAndWait() throws InterruptedException {
         es.invokeAll(cbInvoke);
     }
+
+    public void stop() {
+        if(!es.isShutdown() && !es.isTerminated()) {
+            es.shutdownNow();
+        }
+    }
 }
