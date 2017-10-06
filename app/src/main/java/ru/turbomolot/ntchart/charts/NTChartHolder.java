@@ -47,6 +47,11 @@ public class NTChartHolder {
     private final List<IAxis> axisList = new DataList<>();
     private final Object axisListLock = new Object();
 
+    private final FPSHelper renderFps = new FPSHelper();
+    private final Paint fpsPaintText = new Paint();
+    private final Rect fpsTxtSize = new Rect();
+    private final AtomicBoolean showFps = new AtomicBoolean(false);
+
 //    private final Queue<Map<ISeries, ISeriesHolder>> readyRenderQueue = new LinkedBlockingDeque<>(100);
 //    private final Queue<Map<ISeries, ISeriesHolder>> emptyRenderQueue = new LinkedBlockingDeque<>(100);
 
@@ -93,10 +98,7 @@ public class NTChartHolder {
 //        }
 //    }, 1);
 
-    private final FPSHelper renderFps = new FPSHelper();
-    private final Paint fpsPaintText = new Paint();
-    private final Rect fpsTxtSize = new Rect();
-    private final AtomicBoolean showFps = new AtomicBoolean(true);
+
 
 
     public NTChartHolder(NTChart chart) {
@@ -401,5 +403,13 @@ public class NTChartHolder {
             for (ISeries itm : seriesList)
                 itm.setMatrix(matrix);
         }
+    }
+
+    protected boolean isShowFps() {
+        return showFps.get();
+    }
+
+    protected void setShowFps(boolean showFps) {
+        this.showFps.lazySet(showFps);
     }
 }

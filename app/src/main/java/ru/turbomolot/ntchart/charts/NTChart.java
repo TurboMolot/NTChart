@@ -152,4 +152,12 @@ public class NTChart extends TextureView implements TextureView.SurfaceTextureLi
     public void applyMatrix(PointF startPoint, Matrix matrix) {
         ntChartHolder.applyMatrix(startPoint, matrix);
     }
+
+    protected boolean isShowFps() {
+        return ntChartHolder.isShowFps();
+    }
+
+    protected void setShowFps(boolean showFps) {
+        ntChartHolder.setShowFps(showFps);
+    }
 }
