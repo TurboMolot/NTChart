@@ -46,4 +46,7 @@ public interface ISeriesHolder<P extends IPoint> {
     void setMaxDistanceY(float maxDistanceY);
 
     List<Path> getRenderPaths();
+
+    void setReducePointsEnabled(boolean reducePointsEnabled);
+    boolean isReducePointsEnabled();
 }

@@ -39,6 +39,8 @@ public class SeriesLineHolder implements ISeriesHolder<IPointLine> {
     private float translateX = 0;
     private float translateY = 0;
 
+    private boolean reducePointsEnabled;
+
     private final List<Path> paths = new DataList<>(2);
 
     public SeriesLineHolder() {
@@ -62,7 +64,8 @@ public class SeriesLineHolder implements ISeriesHolder<IPointLine> {
         this.ptsSource = pts;
         updateRenderParam();
         updateScale();
-//        reducePoints();
+        if(isReducePointsEnabled())
+            reducePoints();
         fillPath();
     }
 
@@ -421,5 +424,15 @@ public class SeriesLineHolder implements ISeriesHolder<IPointLine> {
     @Override
     public List<Path> getRenderPaths() {
         return paths;
+    }
+
+    @Override
+    public void setReducePointsEnabled(boolean reducePointsEnabled) {
+        this.reducePointsEnabled = reducePointsEnabled;
+    }
+
+    @Override
+    public boolean isReducePointsEnabled() {
+        return reducePointsEnabled;
     }
 }

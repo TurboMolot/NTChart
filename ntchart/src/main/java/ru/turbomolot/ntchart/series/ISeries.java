@@ -76,4 +76,7 @@ public interface ISeries<P extends IPoint> {
 
     void setTitle(String title);
     String getTitle();
+
+    void setReducePointsEnabled(boolean reducePointsEnabled);
+    boolean isReducePointsEnabled();
 }

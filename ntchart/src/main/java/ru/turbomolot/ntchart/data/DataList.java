@@ -28,6 +28,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Locale;
 import java.util.NoSuchElementException;
 
 import static java.lang.Math.abs;
@@ -1047,7 +1048,8 @@ public class DataList<T> extends AbstractList<T> implements List<T>, Cloneable, 
 
         @Override
         public String toString() {
-            return String.format("[sIndex: %d - eIndex: %d | elementDataPointer: %d | elementDataLength: %d]", startingIndex, endingIndex, elementDataPointer, elementData.length);
+            return String.format(Locale.ENGLISH, "[sIndex: %d - eIndex: %d | elementDataPointer: %d | elementDataLength: %d]",
+                    startingIndex, endingIndex, elementDataPointer, elementData.length);
         }
     }
 }

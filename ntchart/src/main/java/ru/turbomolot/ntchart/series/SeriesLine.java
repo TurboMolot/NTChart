@@ -46,6 +46,7 @@ public class SeriesLine implements ISeries<IPointLine> {
     private Paint fillPaint;
     private Drawable fillDrawable;
     private AtomicBoolean fill = new AtomicBoolean(true);
+    private AtomicBoolean reducePointsEnabled = new AtomicBoolean(false);
 
     private final Object renderLock = new Object();
     private final AtomicReference<String> title = new AtomicReference<>();
@@ -385,5 +386,15 @@ public class SeriesLine implements ISeries<IPointLine> {
         canvas.restoreToCount(cnt);
 
 
+    }
+
+    @Override
+    public void setReducePointsEnabled(boolean reducePointsEnabled) {
+        this.reducePointsEnabled.lazySet(reducePointsEnabled);
+    }
+
+    @Override
+    public boolean isReducePointsEnabled() {
+        return reducePointsEnabled.get();
     }
 }
