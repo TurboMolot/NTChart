@@ -119,8 +119,8 @@ public class NTChart extends TextureView implements TextureView.SurfaceTextureLi
     }
 
     public void notifyChanged() {
-        if(ForegroundDetector.getInstance().isForeground())
-            ntChartHolder.notifyChanged();
+//        if(ForegroundDetector.getInstance().isForeground())
+        ntChartHolder.notifyChanged();
     }
 
     public List<ISeries> getSeriesList() {
