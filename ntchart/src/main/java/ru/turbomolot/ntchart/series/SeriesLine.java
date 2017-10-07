@@ -42,6 +42,11 @@ public class SeriesLine implements ISeries<IPointLine> {
     private final AtomicReference<Float> maxDistanceX = new AtomicReference<>();
     private final AtomicReference<Float> maxDistanceY = new AtomicReference<>();
 
+    private final AtomicReference<Float> minX = new AtomicReference<>(null);
+    private final AtomicReference<Float> maxX = new AtomicReference<>(null);
+    private final AtomicReference<Float> minY = new AtomicReference<>(null);
+    private final AtomicReference<Float> maxY = new AtomicReference<>(null);
+
     private Paint linePaint;
     private Paint fillPaint;
     private Drawable fillDrawable;
@@ -63,6 +68,7 @@ public class SeriesLine implements ISeries<IPointLine> {
         fillPaint.setStyle(Paint.Style.FILL);
         setTitle(title);
     }
+
     public SeriesLine() {
         this(null);
     }
@@ -110,12 +116,23 @@ public class SeriesLine implements ISeries<IPointLine> {
 
     @Override
     public void addPoints(List<? extends IPointLine> points) {
+        addPoints(points, true);
+    }
+
+    @Override
+    public void addPoint(IPointLine point, boolean notifyChanged) {
+        addPoint(point, notifyChanged, true);
+    }
+
+    @Override
+    public void addPoints(List<? extends IPointLine> points, boolean notifyChanged) {
         if (points == null || points.isEmpty())
             return;
         for (IPointLine itm : points)
             addPoint(itm, false, false);
         trimMaxDistanceStore();
-        notifyChanged();
+        if (notifyChanged)
+            notifyChanged();
     }
 
     @Override
@@ -212,7 +229,7 @@ public class SeriesLine implements ISeries<IPointLine> {
 
     public void setLineWidth(float lineWidthPx) {
         Paint lPaint = getLinePaint();
-        if(lPaint != null)
+        if (lPaint != null)
             lPaint.setStrokeWidth(lineWidthPx);
     }
 
@@ -324,6 +341,10 @@ public class SeriesLine implements ISeries<IPointLine> {
         mdxy = maxDistanceY.get();
         holder.setMaxDistanceY(mdxy != null ? mdxy : 0);
         holder.setReducePointsEnabled(isReducePointsEnabled());
+        holder.setMaxX(getMaxX());
+        holder.setMaxY(getMaxY());
+        holder.setMinX(getMinX());
+        holder.setMinY(getMinY());
         holder.calcRender(getPoints());
     }
 
@@ -409,5 +430,45 @@ public class SeriesLine implements ISeries<IPointLine> {
     @Override
     public boolean isReducePointsEnabled() {
         return reducePointsEnabled.get();
+    }
+
+    @Override
+    public void setMinX(Float minX) {
+        this.minX.lazySet(minX);
+    }
+
+    @Override
+    public Float getMinX() {
+        return this.minX.get();
+    }
+
+    @Override
+    public void setMinY(Float minY) {
+        this.minY.lazySet(minY);
+    }
+
+    @Override
+    public Float getMinY() {
+        return this.minY.get();
+    }
+
+    @Override
+    public void setMaxX(Float maxX) {
+        this.maxX.lazySet(maxX);
+    }
+
+    @Override
+    public Float getMaxX() {
+        return this.maxX.get();
+    }
+
+    @Override
+    public void setMaxY(Float maxY) {
+        this.maxY.lazySet(maxY);
+    }
+
+    @Override
+    public Float getMaxY() {
+        return this.maxY.get();
     }
 }

@@ -20,6 +20,7 @@ public interface IAxis {
     AxisPosition getPosition();
     RectF getWindowSize();
     void setWindowSize(float left, float top, float right, float bottom, boolean manual);
+    void setWindowSize(RectF size, boolean manual);
     boolean isWindowSizeManual();
     void setVisible(boolean visible);
     boolean isVisible();
@@ -39,6 +40,8 @@ public interface IAxis {
     int getValueColor();
     void setValuePaint(Paint paint);
     Paint getValuePaint();
+    void setValueCount(int valueCount);
+    int getValueCount();
     void setAxisLinePaint(Paint paint);
     Paint getAxisLinePaint();
     void setGridLinePaint(Paint paint);
@@ -52,4 +55,13 @@ public interface IAxis {
 
     void calcRenderParam(Map<ISeries, ISeriesHolder> holders);
     void render(Canvas canvas, Map<ISeries, ISeriesHolder> holders);
+
+    /**
+     * For internal use
+     * @param listener
+     */
+    void setMaxValueBoundsChange(MaxValueBoundsChange listener);
+    interface MaxValueBoundsChange {
+        void change(IAxis axis, float maxValueBounds);
+    }
 }

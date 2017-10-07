@@ -51,16 +51,19 @@ public class AxisLine implements IAxis {
     private Path valuePath;
     private Paint valuePaint;
 
-    private float maxYStep = 6;
-    private float maxXStep = 6;
+    private float maxStep = 6;
 
     private float posXFrom;
     private float posXTo;
     private float posYFrom;
     private float posYTo;
-//
+    //
     private float posXAxisValue;
     private float posYAxisValue;
+
+    private float prevMaxValueBounds = -1;
+    private WeakReference<MaxValueBoundsChange> wMaxValueBoundsChangeListener;
+    private float offsetValue;
 //
 //    private float xStart;
 //    private float xEnd;
@@ -74,6 +77,7 @@ public class AxisLine implements IAxis {
             throw new NullPointerException("context can not be null");
         this.axisPosition = axisPosition;
         this.wContext = new WeakReference<>(context);
+        this.offsetValue = ConverterUtil.convertDpToPixels(2, context);
 
         this.axisPath = new Path();
         this.axisLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -96,9 +100,21 @@ public class AxisLine implements IAxis {
         this.valuePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         this.valuePaint.setStyle(Paint.Style.FILL);
         this.valuePaint.setColor(Color.parseColor("#1F1F1F"));
-        this.valuePaint.setTextAlign(Paint.Align.CENTER);
+        switch (axisPosition) {
+            case LEFT:
+                this.valuePaint.setTextAlign(Paint.Align.RIGHT);
+                break;
+            case RIGHT:
+                this.valuePaint.setTextAlign(Paint.Align.LEFT);
+                break;
+            case BOTTOM:
+            case TOP:
+                this.valuePaint.setTextAlign(Paint.Align.CENTER);
+                break;
+        }
 
-        if(windowSize != null)
+
+        if (windowSize != null)
             this.windowSize.set(windowSize);
         setValueSize(ConverterUtil.convertDpToPixels(10, context));
 //        int val = ConverterUtil.convertDpToPixels(32, context);
@@ -212,6 +228,20 @@ public class AxisLine implements IAxis {
     }
 
     @Override
+    public void setValueCount(int valueCount) {
+        if(valueCount < 2)
+            valueCount = 2;
+        if(valueCount > 10)
+            valueCount = 10;
+        this.maxStep = valueCount;
+    }
+
+    @Override
+    public int getValueCount() {
+        return (int) this.maxStep;
+    }
+
+    @Override
     public void setAxisLinePaint(Paint paint) {
         this.axisLinePaint = paint;
     }
@@ -289,6 +319,16 @@ public class AxisLine implements IAxis {
     }
 
     @Override
+    public void setWindowSize(RectF size, boolean manual) {
+        if(size == null)
+            return;
+        synchronized (windowSizeLock) {
+            windowSize.set(size);
+            windowSizeManual.lazySet(manual);
+        }
+    }
+
+    @Override
     public boolean isWindowSizeManual() {
         return windowSizeManual.get();
     }
@@ -352,13 +392,13 @@ public class AxisLine implements IAxis {
 
     @Override
     public void render(Canvas canvas, Map<ISeries, ISeriesHolder> holders) {
-        if(!isVisible())
+        if (!isVisible())
             return;
         if (isAxisLineVisible())
             renderAxis(canvas);
-        if(isGridVisible())
+        if (isGridVisible())
             renderGrid(canvas);
-        if(isValueVisible())
+        if (isValueVisible())
             renderAxisValue(canvas, getHolder(holders));
     }
 
@@ -385,32 +425,36 @@ public class AxisLine implements IAxis {
             if ((axisPosition == AxisPosition.LEFT || axisPosition == AxisPosition.RIGHT)) {
                 from = posYFrom;
                 to = posYTo;
-                step = (to - from) / maxYStep;
                 horizontal = false;
             } else {
                 from = posXFrom;
                 to = posXTo;
-                step = (to - from) / maxXStep;
                 horizontal = true;
             }
+            step = (to - from) / (maxStep - 1f);
+
             if (step > 0) {
+                int cnt = (int)maxStep - 1;
                 if (horizontal) {
-                    while ((from += step) < to) {
-                        pathG.moveTo(from, wndSize.top);
-                        pathG.lineTo(from, wndSize.bottom);
+                    while (--cnt > 0) {
+                        to -= step;
+                        pathG.moveTo(to, wndSize.top);
+                        pathG.lineTo(to, wndSize.bottom);
                     }
                 } else {
-                    while ((from += step) < to) {
-                        pathG.moveTo(wndSize.left, from);
-                        pathG.lineTo(wndSize.right, from);
+                    while (--cnt > 0) {
+                        to -= step;
+                        pathG.moveTo(wndSize.left, to);
+                        pathG.lineTo(wndSize.right, to);
                     }
                 }
             }
             canvas.drawPath(pathG, paintG);
         }
     }
+
     protected void renderAxisValue(Canvas canvas, ISeriesHolder holder) {
-        if(holder == null)
+        if (holder == null)
             return;
         Path pathV = getValuePath();
         Paint paintV = getValuePaint();
@@ -425,19 +469,20 @@ public class AxisLine implements IAxis {
             if ((axisPosition == AxisPosition.LEFT || axisPosition == AxisPosition.RIGHT)) {
                 from = posYFrom;
                 to = posYTo;
-                step = (to - from) / maxYStep;
                 horizontal = false;
             } else {
                 from = posXFrom;
                 to = posXTo;
-                step = (to - from) / maxXStep;
                 horizontal = true;
             }
+            step = (to - from) / (maxStep - 1f);
             if (step <= 0)
                 return;
             // TODO Оптимизировать отрисовка текста, например,
             // TODO в процессе рассчёта получать paintV.getTextPath(); для каждого необходимого значения
             String txtVal;
+            float maxValueBounds;
+            int cnt = (int) maxStep;
             if (horizontal) {
                 float val = Math.max(Math.abs(holder.getMaxY()), Math.abs(holder.getMinY()));
                 txtVal = formatterValue.formatText(val, this);
@@ -446,19 +491,21 @@ public class AxisLine implements IAxis {
                 paintV.getTextBounds(txtVal, 0, txtVal.length(), boundsTextMeasuring);
 //                float offsetXc = boundsTextMeasuring.width() >> 1;
                 float offsetY = posYAxisValue + ((axisPosition == AxisPosition.BOTTOM) ?
-                        boundsTextMeasuring.height() + ((int) paintV.getTextSize() >> 1)
-                        : -boundsTextMeasuring.height() - ((int) paintV.getTextSize() >> 1));
-                while (from <= to) {
-                    float valX = holder.toPointX(from);
+                        boundsTextMeasuring.height() + offsetValue
+                        : -boundsTextMeasuring.height() + offsetValue);
+
+                maxValueBounds = boundsTextMeasuring.height();
+                while (--cnt >= 0) {
+                    float valX = holder.toPointX(to);
                     txtVal = formatterValue.formatText(valX, this);
                     if (txtVal == null || txtVal.length() <= 0)
                         continue;
 //                    canvas.drawTextOnPath(txtVal, pathV, from - offsetXc, posYAxisValue, paintV);
                     canvas.drawText(txtVal,
-                            from,
+                            to,
                             offsetY,
                             paintV);
-                    from += step;
+                    to -= step;
                 }
             } else {
                 float val = Math.max(Math.abs(holder.getMaxY()), Math.abs(holder.getMinY()));
@@ -467,24 +514,40 @@ public class AxisLine implements IAxis {
                     return;
                 paintV.getTextBounds(txtVal, 0, txtVal.length(), boundsTextMeasuring);
                 float offsetYc = boundsTextMeasuring.centerY();
-                float offsetX = posXAxisValue + ((axisPosition == AxisPosition.RIGHT) ?
-                        boundsTextMeasuring.width()
-                        : -boundsTextMeasuring.width());
+                float offsetX = posXAxisValue + ((axisPosition == AxisPosition.LEFT) ? -offsetValue : offsetValue);
 
-                while (from <= to) {
-                    txtVal = formatterValue.formatText(holder.toPointY(from), this);
+                maxValueBounds = boundsTextMeasuring.width();
+                while (--cnt >= 0) {
+                    txtVal = formatterValue.formatText(holder.toPointY(to), this);
                     if (txtVal == null || txtVal.length() <= 0)
                         continue;
 //                    canvas.drawTextOnPath(txtVal, pathV, posXAxisValue, from - offsetYc, paintV);
                     canvas.drawText(txtVal,
                             offsetX,
-                            from - offsetYc,
+                            to - offsetYc,
                             paintV);
-                    from += step;
+                    to -= step;
                 }
             }
-//            canvas.drawPath(pathV, paintV);
+            updateMaxValueBounds(maxValueBounds);
+            canvas.drawPath(pathV, paintV);
         }
+    }
+
+    protected void updateMaxValueBounds(float maxValueBounds) {
+        if (maxValueBounds != prevMaxValueBounds) {
+            prevMaxValueBounds = maxValueBounds;
+            MaxValueBoundsChange listener = wMaxValueBoundsChangeListener != null ?
+                    wMaxValueBoundsChangeListener.get() : null;
+            if (!isWindowSizeManual() && listener != null) {
+                listener.change(this, maxValueBounds);
+            }
+        }
+    }
+
+    @Override
+    public void setMaxValueBoundsChange(MaxValueBoundsChange listener) {
+        wMaxValueBoundsChangeListener = new WeakReference<>(listener);
     }
 
     protected Path getAxisPath() {

@@ -123,10 +123,10 @@ public class SeriesLineHolder implements ISeriesHolder<IPointLine> {
     protected void updateRenderParam() {
         List<IPointLine> pts = getPts();
         if (pts == null || pts.isEmpty()) {
-            setMinX(0);
-            setMaxX(0);
-            setMinY(0);
-            setMaxY(0);
+            setMinX(0f);
+            setMaxX(0f);
+            setMinY(0f);
+            setMaxY(0f);
             ptsRender = null;
             return;
         }
@@ -194,7 +194,7 @@ public class SeriesLineHolder implements ISeriesHolder<IPointLine> {
             else if (minX == null)
                 minX = pts.get(0).getX();
         }
-        int idxFrom = MathHelper.getIndexXBefore(pts, minX) + 1;
+        int idxFrom = (minX == null) ? 0 : MathHelper.getIndexXBefore(pts, minX) + 1;
         if (idxFrom < 0)
             idxFrom = 0;
         Float x = (idxFrom < sz) ?
@@ -210,8 +210,10 @@ public class SeriesLineHolder implements ISeriesHolder<IPointLine> {
                 pts.get(idxTo).getX() : null;
         if (x != null)
             max = Math.max(max, x);
-        minX = (min == Float.POSITIVE_INFINITY) ? 0 : min;
-        maxX = (max == Float.NEGATIVE_INFINITY) ? 0 : max;
+        if(minX == null)
+            minX = (min == Float.POSITIVE_INFINITY) ? 0 : min;
+        if(maxX == null)
+            maxX = (max == Float.NEGATIVE_INFINITY) ? 0 : max;
         if (minX < 0) {
             translateX = Math.abs(minX);
         } else {
@@ -226,13 +228,12 @@ public class SeriesLineHolder implements ISeriesHolder<IPointLine> {
             return;
         float[] minMaxY = new float[2];
         pts = MathHelper.reduceToPoint(pts, getRenderWidth(), minMaxY);
-        minY = minMaxY[0];
-        maxY = minMaxY[1];
-        if (minY < 0) {
-            translateY = Math.abs(minY);
-        } else {
-            translateY = -minY;
-        }
+        if(minY == null)
+            minY = minMaxY[0];
+        if(maxY == null)
+            maxY = minMaxY[1];
+
+        translateY = -minY;
         ptsRender = pts;
     }
 
@@ -318,21 +319,21 @@ public class SeriesLineHolder implements ISeriesHolder<IPointLine> {
     public float toRenderY(float y) {
         float scY = matrixValues[Matrix.MSCALE_Y];
         float tY = translateY;
-        return ((y + tY) * scY) + windowSize.top;
+        return windowSize.bottom - ((y + tY) * scY);
     }
 
     @Override
     public float toPointX(float x) {
         float scX = matrixValues[Matrix.MSCALE_X];
         float tX = translateX;// + matrixValues[Matrix.MTRANS_X];
-        return ((x - windowSize.top) / scX) - tX;
+        return ((x - windowSize.left) / scX) - tX;
     }
 
     @Override
     public float toPointY(float y) {
         float scY = matrixValues[Matrix.MSCALE_Y];
         float tY = translateY;
-        return ((getRenderHeight() - (y - windowSize.top)) / scY) - tY;
+        return ((windowSize.bottom - y) / scY) - tY;
     }
 
     @Override
@@ -390,17 +391,9 @@ public class SeriesLineHolder implements ISeriesHolder<IPointLine> {
         return minX;
     }
 
-    protected void setMinX(float minX) {
-        this.minX = minX;
-    }
-
     @Override
     public float getMaxX() {
         return maxX;
-    }
-
-    protected void setMaxX(float maxX) {
-        this.maxX = maxX;
     }
 
     @Override
@@ -408,17 +401,9 @@ public class SeriesLineHolder implements ISeriesHolder<IPointLine> {
         return minY;
     }
 
-    protected void setMinY(float minY) {
-        this.minY = minY;
-    }
-
     @Override
     public float getMaxY() {
         return maxY;
-    }
-
-    protected void setMaxY(float maxY) {
-        this.maxY = maxY;
     }
 
     @Override
@@ -434,5 +419,25 @@ public class SeriesLineHolder implements ISeriesHolder<IPointLine> {
     @Override
     public boolean isReducePointsEnabled() {
         return reducePointsEnabled;
+    }
+
+    @Override
+    public void setMinX(Float minX) {
+        this.minX = minX;
+    }
+
+    @Override
+    public void setMinY(Float minY) {
+        this.minY = minY;
+    }
+
+    @Override
+    public void setMaxX(Float maxX) {
+        this.maxX = maxX;
+    }
+
+    @Override
+    public void setMaxY(Float maxY) {
+        this.maxY = maxY;
     }
 }

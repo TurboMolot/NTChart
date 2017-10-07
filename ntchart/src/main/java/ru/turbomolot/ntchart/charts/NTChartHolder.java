@@ -80,7 +80,7 @@ public class NTChartHolder {
         }
     }, 1);
 
-//    private final ThreadRenderInvoker threadRenderInvoker = new ThreadRenderInvoker(new Runnable() {
+    //    private final ThreadRenderInvoker threadRenderInvoker = new ThreadRenderInvoker(new Runnable() {
 //        @Override
 //        public void run() {
 //            try {
@@ -99,6 +99,36 @@ public class NTChartHolder {
 //            }
 //        }
 //    }, 1);
+    private IAxis.MaxValueBoundsChange maxValueBoundsChange = new IAxis.MaxValueBoundsChange() {
+        @Override
+        public void change(IAxis axis, float maxValueBounds) {
+            if (!axis.isWindowSizeManual()) {
+                NTChart chart = getChart();
+                if (chart == null)
+                    return;
+                float val = ConverterUtil.convertDpToPixels(6, chart.getContext()) + maxValueBounds;
+                synchronized (surfaceSizeLock) {
+                    RectF size = axis.getWindowSize();
+                    switch (axis.getPosition()) {
+                        case LEFT:
+                            size.left = surfaceSize.left + val;
+                            break;
+                        case TOP:
+                            size.top = surfaceSize.top + val;
+                            break;
+                        case RIGHT:
+                            size.right = surfaceSize.right - val;
+                            break;
+                        case BOTTOM:
+                            size.bottom = surfaceSize.bottom - val;
+                            break;
+                    }
+                    axis.setWindowSize(size, false);
+                    updateAxisSizeDepended(axis, size);
+                }
+            }
+        }
+    };
 
 
     public NTChartHolder(NTChart chart) {
@@ -111,8 +141,12 @@ public class NTChartHolder {
         fpsPaintText.setColor(Color.parseColor("#1A7000"));
         fpsPaintText.setTextSize(ConverterUtil.convertDpToPixels(12, context));
 
-        axisList.add(new AxisLine(AxisPosition.LEFT, context, null));
-        axisList.add(new AxisLine(AxisPosition.BOTTOM, context, null));
+        IAxis axis = new AxisLine(AxisPosition.LEFT, context, null);
+        axis.setMaxValueBoundsChange(maxValueBoundsChange);
+        axisList.add(axis);
+        axis = new AxisLine(AxisPosition.BOTTOM, context, null);
+        axis.setMaxValueBoundsChange(maxValueBoundsChange);
+        axisList.add(axis);
     }
 
     protected NTChart getChart() {
@@ -140,6 +174,7 @@ public class NTChartHolder {
     }
 
     protected void appForeground() {
+        notifyChanged();
 //        if (isRealTimeRender() && !isRealTimeRenderRun()) {
 //            startThreadRender();
 //        }
@@ -268,7 +303,7 @@ public class NTChartHolder {
 
     protected RectF getWindowSizeAxis(ISeries series) {
         synchronized (axisListLock) {
-            RectF offsetRes = new RectF(surfaceSize);
+            RectF offsetRes = new RectF();
             for (IAxis it : axisList) {
                 if (it.isDependedSeries(series) && it.isVisible()) {
                     RectF offset = it.getWindowSize();
@@ -278,6 +313,8 @@ public class NTChartHolder {
                     offsetRes.bottom = Math.max(offset.bottom, offsetRes.bottom);
                 }
             }
+            if (offsetRes.isEmpty())
+                offsetRes.set(surfaceSize);
             return offsetRes;
         }
     }
@@ -296,7 +333,7 @@ public class NTChartHolder {
                         size.right -= val;
                         size.top += val;
                         size.bottom -= val;
-                        it.setWindowSize(size.left, size.top, size.right, size.bottom, false);
+                        it.setWindowSize(size, false);
                     }
                 }
             }
@@ -311,14 +348,99 @@ public class NTChartHolder {
         }
     }
 
+    protected void updateAxisSizeDepended(IAxis axis, RectF size) {
+        if (axis.isWindowSizeManual() || size == null || size.isEmpty())
+            return;
+        IAxis axisDepended;
+        RectF sizeDepended;
+        switch (axis.getPosition()) {
+            case LEFT:
+                axisDepended = getAxis(AxisPosition.BOTTOM);
+                if (axisDepended != null && !axisDepended.isWindowSizeManual()) {
+                    sizeDepended = axisDepended.getWindowSize();
+                    sizeDepended.left = size.left;
+                    if (axisDepended.isVisible())
+                        size.bottom = Math.min(size.bottom, size.bottom);
+                    axisDepended.setWindowSize(sizeDepended, false);
+                }
+                axisDepended = getAxis(AxisPosition.TOP);
+                if (axisDepended != null && !axisDepended.isWindowSizeManual()) {
+                    sizeDepended = axisDepended.getWindowSize();
+                    sizeDepended.left = size.left;
+                    if (axisDepended.isVisible())
+                        size.top = Math.min(size.top, size.top);
+                    axisDepended.setWindowSize(sizeDepended, false);
+                }
+                break;
+            case RIGHT:
+                axisDepended = getAxis(AxisPosition.BOTTOM);
+                if (axisDepended != null && !axisDepended.isWindowSizeManual()) {
+                    sizeDepended = axisDepended.getWindowSize();
+                    sizeDepended.right = size.right;
+                    if (axisDepended.isVisible())
+                        size.bottom = Math.min(size.bottom, size.bottom);
+                    axisDepended.setWindowSize(sizeDepended, false);
+                }
+                axisDepended = getAxis(AxisPosition.TOP);
+                if (axisDepended != null && !axisDepended.isWindowSizeManual()) {
+                    sizeDepended = axisDepended.getWindowSize();
+                    sizeDepended.right = size.right;
+                    if (axisDepended.isVisible())
+                        size.top = Math.min(size.top, size.top);
+                    axisDepended.setWindowSize(sizeDepended, false);
+                }
+                break;
+            case TOP:
+                axisDepended = getAxis(AxisPosition.LEFT);
+                if (axisDepended != null && !axisDepended.isWindowSizeManual()) {
+                    sizeDepended = axisDepended.getWindowSize();
+                    sizeDepended.top = size.top;
+                    if (axisDepended.isVisible())
+                        size.left = Math.min(size.left, size.left);
+                    axisDepended.setWindowSize(sizeDepended, false);
+                }
+                axisDepended = getAxis(AxisPosition.RIGHT);
+                if (axisDepended != null && !axisDepended.isWindowSizeManual()) {
+                    sizeDepended = axisDepended.getWindowSize();
+                    sizeDepended.top = size.top;
+                    if (axisDepended.isVisible())
+                        size.right = Math.min(size.right, size.right);
+                    axisDepended.setWindowSize(sizeDepended, false);
+                }
+                break;
+            case BOTTOM:
+                axisDepended = getAxis(AxisPosition.LEFT);
+                if (axisDepended != null && !axisDepended.isWindowSizeManual()) {
+                    sizeDepended = axisDepended.getWindowSize();
+                    sizeDepended.bottom = size.bottom;
+                    if (axisDepended.isVisible())
+                        size.left = Math.min(size.left, size.left);
+                    axisDepended.setWindowSize(sizeDepended, false);
+                }
+                axisDepended = getAxis(AxisPosition.RIGHT);
+                if (axisDepended != null && !axisDepended.isWindowSizeManual()) {
+                    sizeDepended = axisDepended.getWindowSize();
+                    sizeDepended.bottom = size.bottom;
+                    if (axisDepended.isVisible())
+                        size.right = Math.min(size.right, size.right);
+                    axisDepended.setWindowSize(sizeDepended, false);
+                }
+                break;
+        }
+        axis.setWindowSize(size, false);
+        updateSeriesSizeAll();
+        notifyChanged();
+    }
+
     protected void updateSeriesSize(ISeries series) {
         if (series != null && (series.getWindowSize().isEmpty() || !series.isWindowSizeManual())) {
             RectF size = getWindowSizeAxis(series);
-            synchronized (surfaceSizeLock) {
-                if (size.isEmpty())
+            if (size.isEmpty()) {
+                synchronized (surfaceSizeLock) {
                     size = new RectF(surfaceSize);
-                series.setWindowSize(size.left, size.top, size.right, size.bottom, false);
+                }
             }
+            series.setWindowSize(size.left, size.top, size.right, size.bottom, false);
         }
     }
 

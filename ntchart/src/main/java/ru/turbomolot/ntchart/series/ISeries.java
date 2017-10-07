@@ -23,7 +23,9 @@ public interface ISeries<P extends IPoint> {
     void render(Canvas canvas, ISeriesHolder holder, Map<ISeries, ISeriesHolder> holders);
 
     void addPoint(P point);
+    void addPoint(P point, boolean notifyChanged);
     void addPoints(List<? extends P> points);
+    void addPoints(List<? extends P> points, boolean notifyChanged);
     void clearPoints();
     List<P> getPoints();
     void notifyChanged();
@@ -79,4 +81,13 @@ public interface ISeries<P extends IPoint> {
 
     void setReducePointsEnabled(boolean reducePointsEnabled);
     boolean isReducePointsEnabled();
+
+    void setMinX(Float minX);
+    Float getMinX();
+    void setMinY(Float minY);
+    Float getMinY();
+    void setMaxX(Float maxX);
+    Float getMaxX();
+    void setMaxY(Float maxY);
+    Float getMaxY();
 }

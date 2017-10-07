@@ -18,6 +18,12 @@ public interface ISeriesHolder<P extends IPoint> {
     float getMinX();
     float getMinY();
 
+    void setMinX(Float minX);
+    void setMinY(Float minY);
+    void setMaxX(Float maxX);
+    void setMaxY(Float maxY);
+
+
     Matrix getMatrix();
     void setMatrix(Matrix matrix);
 
