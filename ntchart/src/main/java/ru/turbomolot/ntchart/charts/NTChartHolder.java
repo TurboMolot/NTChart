@@ -318,7 +318,7 @@ public class NTChartHolder {
         NTChart chart = getChart();
         if (chart == null)
             return;
-        int val = ConverterUtil.convertDpToPixels(32, chart.getContext());
+        int val = ConverterUtil.convertDpToPixels(14, chart.getContext());
         synchronized (axisListLock) {
             for (IAxis it : axisList) {
                 if (!it.isWindowSizeManual()) {

@@ -495,17 +495,24 @@ public class AxisLine implements IAxis {
                         : -boundsTextMeasuring.height() + offsetValue);
 
                 maxValueBounds = boundsTextMeasuring.height();
+                Paint.Align txtAlign = paintV.getTextAlign();
                 while (--cnt >= 0) {
                     float valX = holder.toPointX(to);
                     txtVal = formatterValue.formatText(valX, this);
-                    if (txtVal == null || txtVal.length() <= 0)
+                    if (txtVal == null || txtVal.length() <= 0) {
+                        to -= step;
                         continue;
+                    }
+                    if(cnt == 0 && txtAlign != Paint.Align.LEFT)
+                        paintV.setTextAlign(Paint.Align.LEFT);
 //                    canvas.drawTextOnPath(txtVal, pathV, from - offsetXc, posYAxisValue, paintV);
                     canvas.drawText(txtVal,
                             to,
                             offsetY,
                             paintV);
                     to -= step;
+                    if(cnt == 0 && txtAlign != paintV.getTextAlign())
+                        paintV.setTextAlign(txtAlign);
                 }
             } else {
                 float val = Math.max(Math.abs(holder.getMaxY()), Math.abs(holder.getMinY()));
@@ -519,8 +526,10 @@ public class AxisLine implements IAxis {
                 maxValueBounds = boundsTextMeasuring.width();
                 while (--cnt >= 0) {
                     txtVal = formatterValue.formatText(holder.toPointY(to), this);
-                    if (txtVal == null || txtVal.length() <= 0)
+                    if (txtVal == null || txtVal.length() <= 0) {
+                        to -= step;
                         continue;
+                    }
 //                    canvas.drawTextOnPath(txtVal, pathV, posXAxisValue, from - offsetYc, paintV);
                     canvas.drawText(txtVal,
                             offsetX,
