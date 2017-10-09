@@ -52,6 +52,7 @@ public class SeriesLine implements ISeries<IPointLine> {
     private Drawable fillDrawable;
     private AtomicBoolean fill = new AtomicBoolean(true);
     private AtomicBoolean reducePointsEnabled = new AtomicBoolean(false);
+    private AtomicBoolean renderFromAxisRight = new AtomicBoolean(true);
 
     private final Object renderLock = new Object();
     private final AtomicReference<String> title = new AtomicReference<>();
@@ -345,6 +346,7 @@ public class SeriesLine implements ISeries<IPointLine> {
         holder.setMaxY(getMaxY());
         holder.setMinX(getMinX());
         holder.setMinY(getMinY());
+        holder.setRenderFromAxisRight(isRenderFromAxisRight());
         holder.calcRender(getPoints());
     }
 
@@ -466,5 +468,13 @@ public class SeriesLine implements ISeries<IPointLine> {
     @Override
     public Float getMaxY() {
         return this.maxY.get();
+    }
+
+    public boolean isRenderFromAxisRight() {
+        return renderFromAxisRight.get();
+    }
+
+    public void setRenderFromAxisRight(boolean renderFromAxisRight) {
+        this.renderFromAxisRight.lazySet(renderFromAxisRight);
     }
 }

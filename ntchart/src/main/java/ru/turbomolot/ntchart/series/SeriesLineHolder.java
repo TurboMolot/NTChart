@@ -163,7 +163,7 @@ public class SeriesLineHolder implements ISeriesHolder<IPointLine> {
             idxTo = Math.max(Math.min(MathHelper.getIndexXBefore(pts, max) + 1, lastIdx), 0);
             max = pts.get(idxTo).getX();
             if (minX == null)
-                min = (maxDistX > 0) ? max - maxDistX : pts.get(0).getX();
+                min = (maxDistX > 0 && max > maxDistX ) ? max - maxDistX : pts.get(0).getX();
             else
                 min = minX;
             idxFrom = Math.max(Math.min(MathHelper.getIndexXBefore(pts, min), lastIdx), 0);
@@ -174,14 +174,10 @@ public class SeriesLineHolder implements ISeriesHolder<IPointLine> {
         maxX = max;
         minX = min;
 
-        if (minX < 0) {
-            translateX = Math.abs(minX);
-        } else {
-            if(Math.abs(maxX - minX) < maxDistX && isRenderFromAxisRight())
-                translateX = maxDistX - maxX;
-            else
-                translateX = -minX;
-        }
+        if(Math.abs(maxX - minX) < maxDistX && isRenderFromAxisRight())
+            translateX = maxDistX - maxX;
+        else
+            translateX = -minX;
 
         // Y param
         pts = pts.subList(idxFrom, idxTo + 1);
