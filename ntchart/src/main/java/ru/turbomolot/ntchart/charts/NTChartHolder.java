@@ -253,8 +253,6 @@ public class NTChartHolder {
         if (canvas == null)
             return;
         try {
-            long time = System.currentTimeMillis();
-
             canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
             canvas.drawColor(Color.TRANSPARENT);
             for (IAxis it : axisList) {
@@ -264,11 +262,8 @@ public class NTChartHolder {
                 ISeriesHolder holder = holderMap.get(it);
                 if (holder == null)
                     continue;
-                long timeStep = System.currentTimeMillis();
                 it.render(canvas, holder, holderMap);
-                Log.d("[NTChartHolder_FRAME]", "[time frame]: " + String.valueOf(System.currentTimeMillis() - timeStep));
             }
-            Log.d("[NTChartHolder]", "[time frame]: " + String.valueOf(System.currentTimeMillis() - time));
             renderFps(canvas);
         } finally {
             surfaceRender.unlockCanvasAndPost(canvas);

@@ -80,7 +80,7 @@ public class SeriesLine implements ISeries<IPointLine> {
                 if (ptsSource != null && ptsSource.size() > 1) {
                     float lastVal = ptsSource.get(ptsSource.size() - 1).getX();
                     if (Math.abs(lastVal - ptsSource.get(0).getX()) > maxDistanceCurrent) {
-                        int idxEnd = (getIndexXBefore(lastVal - maxDistanceCurrent) + 1);
+                        int idxEnd = getIndexXBefore(lastVal - maxDistanceCurrent);
                         if (idxEnd >= 0 && idxEnd < ptsSource.size())
                             ptsSource.subList(0, idxEnd).clear();
                     }
@@ -359,13 +359,9 @@ public class SeriesLine implements ISeries<IPointLine> {
             Path lPath = paths.get(0);
             Path fPath = paths.get(1);
 
-            long time = System.currentTimeMillis();
             renderLine(canvas, ptsRender, holder, holders, lPath);
-            Log.d("[111]", "[1]: " + String.valueOf(System.currentTimeMillis() - time));
             if (isFill()) {
-                time = System.currentTimeMillis();
                 renderFill(canvas, ptsRender, holder, holders, fPath);
-                Log.d("[111]", "[2]: " + String.valueOf(System.currentTimeMillis() - time));
             }
         }
     }

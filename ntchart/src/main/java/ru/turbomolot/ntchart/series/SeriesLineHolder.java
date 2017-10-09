@@ -64,7 +64,7 @@ public class SeriesLineHolder implements ISeriesHolder<IPointLine> {
         this.ptsSource = pts;
         updateRenderParam();
         updateScale();
-        if(isReducePointsEnabled())
+        if (isReducePointsEnabled())
             reducePoints();
         fillPath();
     }
@@ -109,6 +109,7 @@ public class SeriesLineHolder implements ISeriesHolder<IPointLine> {
             y = toRenderY(curPoint.getY());
             lPath.lineTo(x, y);
         }
+        fPath.lineTo(x, y);
         fPath.lineTo(x, minYPx);
         fPath.close();
     }
@@ -130,90 +131,49 @@ public class SeriesLineHolder implements ISeriesHolder<IPointLine> {
             ptsRender = null;
             return;
         }
-        final int sz = pts.size();
-//
-//        float[] values = new float[9];
-//        matrix.getValues(values);
-//        float scaleX = values[Matrix.MSCALE_X] <= 0 ? 1 : values[Matrix.MSCALE_X];
-////        scaleX *= values[Matrix.MSCALE_X];
-////        scaleY *= values[Matrix.MSCALE_Y];
 
-        float min = Float.POSITIVE_INFINITY;
-        float max = Float.NEGATIVE_INFINITY;
+        int idxTo, idxFrom;
+        float min, max;
+
+        // X param
         float maxDistX = getMaxDistanceX();
-//        IPointLine first = pts.get(0);
-//        IPointLine last = pts.get(sz - 1);
-//        float maxDistPtsX = Math.abs(first.getX() - last.getX());
-//        if(maxDistX > maxDistPtsX) {
-//            maxDistX = maxDistPtsX;
-//        }
+        final int sz = pts.size();
         Float lastX = getLastValueX();
-        int lastIdx;
-//        if(lastX == null && matrixValues[Matrix.MTRANS_X] != 0) {
-//            lastX = pts.get(sz - 1).getX();
-//            int idxFrom = 0;
-//            if(maxDistX > 0) {
-//                idxFrom = MathHelper.getIndexXBefore(pts, lastX - maxDistX) + 1;
-//                if(idxFrom < 0 || idxFrom > sz - 1)
-//                    idxFrom = 0;
-//            }
-//            float firstX = pts.get(idxFrom).getX();
-//            float scaleX = getRenderWidth() / Math.abs(lastX - firstX);
-//            matrixValues[Matrix.MTRANS_X] = matrixValues[Matrix.MTRANS_X]/scaleX;
-//            lastX -= matrixValues[Matrix.MTRANS_X];
-//            if(maxDistX > 0) {
-//                idxFrom = MathHelper.getIndexXBefore(pts, lastX - maxDistX) + 1;
-//                if(idxFrom < 0 || idxFrom > sz - 1)
-//                    idxFrom = 0;
-//                firstX = pts.get(idxFrom).getX();
-//                if(Math.abs(lastX - firstX) < maxDistX) {
-//                    lastX = firstX + maxDistX;
-//                }
-//            }
-//        }
+        int lastIdx = sz - 1;
 
-
-        if (lastX != null) {
-            lastIdx = MathHelper.getIndexXBefore(pts, lastX) + 1;
-            if (lastIdx < 0)
-                lastIdx = 0;
-            else if (lastIdx >= sz)
-                lastIdx = sz - 1;
+        if(!isAutoMoveLastX()) {
+            min = (minX == null) ? pts.get(0).getX() : minX;
+            if(maxX != null)
+                max = maxX;
+            else {
+                if (lastX != null) {
+                    lastIdx = Math.min(MathHelper.getIndexXBefore(pts, lastX) + 1, sz - 1);
+                    if (lastIdx < 0) lastIdx = 0;
+                }
+                max = (maxDistX > 0) ? min + maxDistX : pts.get(lastIdx).getX();
+            }
+            idxTo = Math.max(Math.min(MathHelper.getIndexXBefore(pts, max) + 1, lastIdx), 0);
+            idxFrom = Math.max(Math.min(MathHelper.getIndexXBefore(pts, min), lastIdx), 0);
         } else {
-            lastIdx = sz - 1;
-        }
-        if (!isAutoMoveLastX()) {
+            if (lastX != null) {
+                lastIdx = Math.min(MathHelper.getIndexXBefore(pts, lastX) + 1, sz - 1);
+                if (lastIdx < 0) lastIdx = 0;
+            }
+            max = (maxX == null) ? pts.get(lastIdx).getX() : maxX;
+            idxTo = Math.max(Math.min(MathHelper.getIndexXBefore(pts, max) + 1, lastIdx), 0);
+            max = pts.get(idxTo).getX();
             if (minX == null)
-                minX = pts.get(0).getX();
-            if (maxX == null)
-                maxX = pts.get(lastIdx).getX();
-        } else {
-            maxX = pts.get(lastIdx).getX();
-            if (maxDistX > 0)
-                minX = maxX - maxDistX;
-            else if (minX == null)
-                minX = pts.get(0).getX();
+                min = (maxDistX > 0) ? max - maxDistX : pts.get(0).getX();
+            else
+                min = minX;
+            idxFrom = Math.max(Math.min(MathHelper.getIndexXBefore(pts, min), lastIdx), 0);
         }
-        int idxFrom = (minX == null) ? 0 : MathHelper.getIndexXBefore(pts, minX) + 1;
-        if (idxFrom < 0)
-            idxFrom = 0;
-        Float x = (idxFrom < sz) ?
-                pts.get(idxFrom).getX() : null;
+//        if(lastX == null && matrixValues[Matrix.MTRANS_X] != 0) {
+//            // TODO отработать перемещение по оси X
+//        }
+        maxX = max;
+        minX = min;
 
-        final int idxTo = (maxDistX <= 0) ?
-                lastIdx :
-                Math.min((MathHelper.getIndexXBefore(pts, (x != null) ?
-                        x + maxDistX : pts.get(lastIdx).getX()) + 1), lastIdx);
-        if (x != null)
-            min = Math.min(min, x);
-        x = (idxTo >= 0 && idxTo < sz) ?
-                pts.get(idxTo).getX() : null;
-        if (x != null)
-            max = Math.max(max, x);
-        if(minX == null)
-            minX = (min == Float.POSITIVE_INFINITY) ? 0 : min;
-        if(maxX == null)
-            maxX = (max == Float.NEGATIVE_INFINITY) ? 0 : max;
         if (minX < 0) {
             translateX = Math.abs(minX);
         } else {
@@ -222,15 +182,16 @@ public class SeriesLineHolder implements ISeriesHolder<IPointLine> {
             else
                 translateX = -minX;
         }
+
         // Y param
         pts = pts.subList(idxFrom, idxTo + 1);
         if (pts.isEmpty())
             return;
         float[] minMaxY = new float[2];
         pts = MathHelper.reduceToPoint(pts, getRenderWidth(), minMaxY);
-        if(minY == null)
+        if (minY == null)
             minY = minMaxY[0];
-        if(maxY == null)
+        if (maxY == null)
             maxY = minMaxY[1];
 
         translateY = -minY;
@@ -298,7 +259,7 @@ public class SeriesLineHolder implements ISeriesHolder<IPointLine> {
 
     @Override
     public void setWindowSize(float left, float top, float right, float bottom) {
-        if(windowSize == null)
+        if (windowSize == null)
             windowSize = new RectF();
         this.windowSize.set(left, top, right, bottom);
     }
