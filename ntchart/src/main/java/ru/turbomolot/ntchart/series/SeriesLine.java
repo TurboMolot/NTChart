@@ -51,6 +51,7 @@ public class SeriesLine implements ISeries<IPointLine> {
     private Paint fillPaint;
     private Drawable fillDrawable;
     private AtomicBoolean fill = new AtomicBoolean(true);
+    private AtomicBoolean lineVisible = new AtomicBoolean(true);
     private AtomicBoolean reducePointsEnabled = new AtomicBoolean(false);
     private AtomicBoolean renderFromAxisRight = new AtomicBoolean(false);
 
@@ -177,6 +178,13 @@ public class SeriesLine implements ISeries<IPointLine> {
     @Override
     public boolean isFill() {
         return fill.get();
+    }
+
+    public void setLineVisible(boolean fill) {
+        this.lineVisible.lazySet(fill);
+    }
+    public boolean isLineVisible() {
+        return lineVisible.get();
     }
 
     @Override
@@ -361,10 +369,10 @@ public class SeriesLine implements ISeries<IPointLine> {
             Path lPath = paths.get(0);
             Path fPath = paths.get(1);
 
-            renderLine(canvas, ptsRender, holder, holders, lPath);
-            if (isFill()) {
+            if(isLineVisible())
+                renderLine(canvas, ptsRender, holder, holders, lPath);
+            if (isFill())
                 renderFill(canvas, ptsRender, holder, holders, fPath);
-            }
         }
     }
 
