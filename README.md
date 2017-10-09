@@ -21,6 +21,6 @@ allprojects {
  
 ```gradle
 dependencies {
-    compile 'com.github.TurboMolot:NTChart:0.0.4'
+    compile 'com.github.TurboMolot:NTChart:0.0.5'
 }
 ```
