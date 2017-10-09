@@ -7,8 +7,6 @@ A simple component for displaying charts Android apps
 Usage
 -----
 
-In order to use the library, there are 4 different options:
-
 **1. Gradle dependency** (recommended)
 
   -  Add the following to your project level `build.gradle`:
@@ -23,6 +21,6 @@ allprojects {
  
 ```gradle
 dependencies {
-    compile 'com.github.TurboMolot:NTChart:0.0.1'
+    compile 'com.github.TurboMolot:NTChart:0.0.3'
 }
 ```
