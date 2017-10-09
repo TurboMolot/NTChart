@@ -52,7 +52,7 @@ public class SeriesLine implements ISeries<IPointLine> {
     private Drawable fillDrawable;
     private AtomicBoolean fill = new AtomicBoolean(true);
     private AtomicBoolean reducePointsEnabled = new AtomicBoolean(false);
-    private AtomicBoolean renderFromAxisRight = new AtomicBoolean(true);
+    private AtomicBoolean renderFromAxisRight = new AtomicBoolean(false);
 
     private final Object renderLock = new Object();
     private final AtomicReference<String> title = new AtomicReference<>();
