@@ -30,7 +30,7 @@ public class ForegroundDetector implements Application.ActivityLifecycleCallback
     private static ForegroundDetector instance;
 
     private final Handler mainThreadHandler = new Handler(Looper.getMainLooper());
-    private boolean isForeground = false;
+    private boolean isForeground = true;
     private int count;
     private List<ForegroundListener> listeners = new CopyOnWriteArrayList<>();
 
