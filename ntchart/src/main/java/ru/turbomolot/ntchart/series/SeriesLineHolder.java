@@ -234,10 +234,8 @@ public class SeriesLineHolder implements ISeriesHolder<IPointLine> {
     protected final void reducePoints() {
         if (ptsRender == null || ptsRender.isEmpty())
             return;
-        float[] values = new float[9];
-        matrix.getValues(values);
-        float scaleX = values[Matrix.MSCALE_X];
-        float scaleY = values[Matrix.MSCALE_Y];
+        float scaleX = getScaleX();
+        float scaleY = getScaleY();
         if (scaleX <= 0 && scaleY <= 0)
             return;
         float tolerance = 1 / Math.max(scaleX, scaleY);
@@ -271,28 +269,28 @@ public class SeriesLineHolder implements ISeriesHolder<IPointLine> {
 
     @Override
     public float toRenderX(float x) {
-        float scX = matrixValues[Matrix.MSCALE_X];
+        float scX = getScaleX();
         float tX = translateX;// + matrixValues[Matrix.MTRANS_X];
         return ((x + tX) * scX) + windowSize.left;
     }
 
     @Override
     public float toRenderY(float y) {
-        float scY = matrixValues[Matrix.MSCALE_Y];
+        float scY = getScaleY();
         float tY = translateY;
         return windowSize.bottom - ((y + tY) * scY);
     }
 
     @Override
     public float toPointX(float x) {
-        float scX = matrixValues[Matrix.MSCALE_X];
+        float scX = getScaleX();
         float tX = translateX;// + matrixValues[Matrix.MTRANS_X];
         return ((x - windowSize.left) / scX) - tX;
     }
 
     @Override
     public float toPointY(float y) {
-        float scY = matrixValues[Matrix.MSCALE_Y];
+        float scY = getScaleY();
         float tY = translateY;
         return ((windowSize.bottom - y) / scY) - tY;
     }
@@ -400,5 +398,15 @@ public class SeriesLineHolder implements ISeriesHolder<IPointLine> {
     @Override
     public void setMaxY(Float maxY) {
         this.maxY = maxY;
+    }
+
+    @Override
+    public float getScaleX() {
+        return matrixValues[Matrix.MSCALE_X];
+    }
+
+    @Override
+    public float getScaleY() {
+        return matrixValues[Matrix.MSCALE_Y];
     }
 }

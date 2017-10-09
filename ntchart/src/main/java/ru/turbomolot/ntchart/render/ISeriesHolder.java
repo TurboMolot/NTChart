@@ -55,4 +55,7 @@ public interface ISeriesHolder<P extends IPoint> {
 
     void setReducePointsEnabled(boolean reducePointsEnabled);
     boolean isReducePointsEnabled();
+
+    float getScaleX();
+    float getScaleY();
 }
