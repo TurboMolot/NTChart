@@ -505,6 +505,8 @@ public class AxisLine implements IAxis {
                     }
                     if(cnt == 0 && txtAlign != Paint.Align.LEFT)
                         paintV.setTextAlign(Paint.Align.LEFT);
+                    else if(cnt == (maxStep - 1) && txtAlign != Paint.Align.RIGHT)
+                        paintV.setTextAlign(Paint.Align.RIGHT);
 //                    canvas.drawTextOnPath(txtVal, pathV, from - offsetXc, posYAxisValue, paintV);
                     canvas.drawText(txtVal,
                             to,
@@ -512,6 +514,8 @@ public class AxisLine implements IAxis {
                             paintV);
                     to -= step;
                     if(cnt == 0 && txtAlign != paintV.getTextAlign())
+                        paintV.setTextAlign(txtAlign);
+                    else if(cnt == (maxStep - 1) && txtAlign != paintV.getTextAlign())
                         paintV.setTextAlign(txtAlign);
                 }
             } else {
