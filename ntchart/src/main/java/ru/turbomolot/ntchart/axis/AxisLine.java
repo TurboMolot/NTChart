@@ -8,7 +8,6 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.support.annotation.ColorInt;
 
 import java.lang.ref.WeakReference;
 import java.util.Iterator;
@@ -205,7 +204,7 @@ public class AxisLine implements IAxis {
     }
 
     @Override
-    public void setValueColor(@ColorInt int color) {
+    public void setValueColor(int color) {
         Paint paint = getValuePaint();
         if (paint != null)
             paint.setColor(color);

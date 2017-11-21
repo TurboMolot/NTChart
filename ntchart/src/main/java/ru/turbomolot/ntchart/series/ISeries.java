@@ -5,7 +5,6 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.ColorInt;
 
 import java.util.List;
 import java.util.Map;
@@ -58,11 +57,11 @@ public interface ISeries<P extends IPoint> {
 
     void setFillDrawable(Drawable fillDrawable);
     Drawable getFillDrawable();
-    void setFillColor(@ColorInt int fillColor);
+    void setFillColor(int fillColor);
     int getFillColor();
     void setFillPaint(Paint fillPaint);
     Paint getFillPaint();
-    void setColor(@ColorInt int color);
+    void setColor(int color);
     int getColor();
 
     ISeriesHolder createHolder();

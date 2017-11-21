@@ -7,11 +7,8 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.ColorInt;
-import android.util.Log;
 
 import java.lang.ref.WeakReference;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -20,7 +17,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import ru.turbomolot.ntchart.charts.NTChart;
 import ru.turbomolot.ntchart.data.DataList;
 import ru.turbomolot.ntchart.data.IPointLine;
-import ru.turbomolot.ntchart.data.PointLine;
 import ru.turbomolot.ntchart.render.ISeriesHolder;
 import ru.turbomolot.ntchart.utils.MathHelper;
 
@@ -200,7 +196,7 @@ public class SeriesLine implements ISeries<IPointLine> {
     }
 
     @Override
-    public void setFillColor(@ColorInt int fillColor) {
+    public void setFillColor(int fillColor) {
         synchronized (renderLock) {
             Paint paint = getFillPaint();
             if (paint != null)
@@ -243,7 +239,7 @@ public class SeriesLine implements ISeries<IPointLine> {
     }
 
     @Override
-    public void setColor(@ColorInt int color) {
+    public void setColor(int color) {
         synchronized (renderLock) {
             Paint paint = getLinePaint();
             if (paint != null)

@@ -3,9 +3,7 @@ package ru.turbomolot.ntchart.axis;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
-import android.support.annotation.ColorInt;
 
-import java.util.List;
 import java.util.Map;
 
 import ru.turbomolot.ntchart.formatter.IFormatterValue;
@@ -36,7 +34,7 @@ public interface IAxis {
     float getGridLineWidth();
     void setValueSize(float sizePx);
     float getValueSize();
-    void setValueColor(@ColorInt int color);
+    void setValueColor(int color);
     int getValueColor();
     void setValuePaint(Paint paint);
     Paint getValuePaint();
