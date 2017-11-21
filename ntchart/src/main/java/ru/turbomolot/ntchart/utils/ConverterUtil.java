@@ -132,6 +132,7 @@ public final class ConverterUtil {
             return String.format(Locale.ENGLISH, "%02d:%02d", minute, second);
     }
 
+    @SuppressWarnings("deprecation")
     public static Locale getCurrentLocale(Context c) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             return c.getResources().getConfiguration().getLocales().get(0);

@@ -239,6 +239,7 @@ public class NTChartHolder {
         }
     }
 
+    @SuppressWarnings("unchecked")
     protected void renderFrame(Map<ISeries, ISeriesHolder> holderMap) throws InterruptedException {
         final List<ISeries> series = getSeriesList();
         if (series.isEmpty() || holderMap == null)

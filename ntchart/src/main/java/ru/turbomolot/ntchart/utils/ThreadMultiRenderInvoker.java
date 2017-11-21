@@ -63,6 +63,7 @@ public class ThreadMultiRenderInvoker {
         }
 
         @Override
+        @SuppressWarnings("unchecked")
         public Void call() throws Exception {
             RectF wndSize = holder.getWindowSize();
             Canvas canvas = picture.beginRecording((int) wndSize.right, (int)wndSize.bottom);
