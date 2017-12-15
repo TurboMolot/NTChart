@@ -115,7 +115,7 @@ public class NTChart extends TextureView implements TextureView.SurfaceTextureLi
 
     @Override
     public void onSurfaceTextureUpdated(SurfaceTexture surface) {
-        notifyChanged();
+//        notifyChanged();
     }
 
     public void notifyChanged() {

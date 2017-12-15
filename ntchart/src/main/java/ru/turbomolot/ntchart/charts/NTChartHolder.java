@@ -78,7 +78,7 @@ public class NTChartHolder {
                 Log.w("[NTChartHolder]", ex);
             }
         }
-    }, 1);
+    });
 
     //    private final ThreadRenderInvoker threadRenderInvoker = new ThreadRenderInvoker(new Runnable() {
 //        @Override
