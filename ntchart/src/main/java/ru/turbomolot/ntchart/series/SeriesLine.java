@@ -136,6 +136,8 @@ public class SeriesLine implements ISeries<IPointLine> {
                 addPoint(itm, false, false);
         } else {
             synchronized (ptsLock) {
+                if (ptsSource == null)
+                    ptsSource = new DataList<>();
                 ptsSource.addAll(points);
             }
         }
