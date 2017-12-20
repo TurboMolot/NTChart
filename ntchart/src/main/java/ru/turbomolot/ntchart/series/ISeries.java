@@ -20,6 +20,8 @@ import ru.turbomolot.ntchart.render.ISeriesHolder;
 public interface ISeries<P extends IPoint> {
     void calcParamRender(ISeriesHolder holder);
     void render(Canvas canvas, ISeriesHolder holder, Map<ISeries, ISeriesHolder> holders);
+    void setReorder(boolean needReorder);
+    boolean isReorder();
 
     void addPoint(P point);
     void addPoint(P point, boolean notifyChanged);

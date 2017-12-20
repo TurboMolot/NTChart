@@ -53,6 +53,7 @@ public class SeriesLine implements ISeries<IPointLine> {
 
     private final Object renderLock = new Object();
     private final AtomicReference<String> title = new AtomicReference<>();
+    private boolean needReorder;
 
     public SeriesLine(String title) {
         linePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -97,8 +98,12 @@ public class SeriesLine implements ISeries<IPointLine> {
         synchronized (ptsLock) {
             if (ptsSource == null)
                 ptsSource = new DataList<>();
-            int idx = getIndexXBefore(point.getX()) + 1;
-            ptsSource.add(idx, point);
+            if (isReorder()) {
+                int idx = getIndexXBefore(point.getX()) + 1;
+                ptsSource.add(idx, point);
+            } else {
+                ptsSource.add(point);
+            }
         }
         if (trimDataSet)
             trimMaxDistanceStore();
@@ -126,8 +131,14 @@ public class SeriesLine implements ISeries<IPointLine> {
     public void addPoints(List<? extends IPointLine> points, boolean notifyChanged) {
         if (points == null || points.isEmpty())
             return;
-        for (IPointLine itm : points)
-            addPoint(itm, false, false);
+        if (isReorder()) {
+            for (IPointLine itm : points)
+                addPoint(itm, false, false);
+        } else {
+            synchronized (ptsLock) {
+                ptsSource.addAll(points);
+            }
+        }
         trimMaxDistanceStore();
         if (notifyChanged)
             notifyChanged();
@@ -179,6 +190,7 @@ public class SeriesLine implements ISeries<IPointLine> {
     public void setLineVisible(boolean fill) {
         this.lineVisible.lazySet(fill);
     }
+
     public boolean isLineVisible() {
         return lineVisible.get();
     }
@@ -365,7 +377,7 @@ public class SeriesLine implements ISeries<IPointLine> {
             Path lPath = paths.get(0);
             Path fPath = paths.get(1);
 
-            if(isLineVisible())
+            if (isLineVisible())
                 renderLine(canvas, ptsRender, holder, holders, lPath);
             if (isFill())
                 renderFill(canvas, ptsRender, holder, holders, fPath);
@@ -480,5 +492,15 @@ public class SeriesLine implements ISeries<IPointLine> {
 
     public void setRenderFromAxisRight(boolean renderFromAxisRight) {
         this.renderFromAxisRight.lazySet(renderFromAxisRight);
+    }
+
+    @Override
+    public boolean isReorder() {
+        return needReorder;
+    }
+
+    @Override
+    public void setReorder(boolean needReorder) {
+        this.needReorder = needReorder;
     }
 }
