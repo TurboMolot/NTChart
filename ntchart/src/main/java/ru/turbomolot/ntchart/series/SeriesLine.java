@@ -149,7 +149,8 @@ public class SeriesLine implements ISeries<IPointLine> {
     @Override
     public void clearPoints() {
         synchronized (ptsLock) {
-            ptsSource.clear();
+            if(ptsSource != null)
+                ptsSource.clear();
         }
     }
 
