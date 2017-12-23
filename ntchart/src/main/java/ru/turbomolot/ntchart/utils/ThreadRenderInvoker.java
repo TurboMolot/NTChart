@@ -6,6 +6,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -22,14 +23,21 @@ public class ThreadRenderInvoker {
     private final Callable<Void> callable;
     private final AtomicBoolean needUpdate = new AtomicBoolean();
     private final FPSHelper fpsHelper = new FPSHelper();
-    private final static long ACTIVE_TIME_MS = TimeUnit.SECONDS.toMillis(3);
+    private final static long ACTIVE_TIME_MS = TimeUnit.SECONDS.toMillis(1);
     private Future<Void> future;
 
     public ThreadRenderInvoker(Runnable renderProcessor) {
         if (renderProcessor == null)
             throw new NullPointerException("renderProcessor can not be null");
         this.renderProcessor = renderProcessor;
-        this.es = Executors.newSingleThreadExecutor();
+        this.es = Executors.newSingleThreadExecutor(new ThreadFactory() {
+            @Override
+            public Thread newThread(Runnable r) {
+                Thread th = new Thread(r);
+                th.setName("ThRenderInvoker");
+                return th;
+            }
+        });
         this.callable = createCallable();
         this.fpsHelper.setNormalFPS(30);
     }
@@ -45,6 +53,7 @@ public class ThreadRenderInvoker {
                         renderProcessor.run();
                         fpsHelper.sleepNormal();
                         if (needUpdate.get()) {
+                            needUpdate.set(false);
                             time = currTime + ACTIVE_TIME_MS;
                         }
                     }

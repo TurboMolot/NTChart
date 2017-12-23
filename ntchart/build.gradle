@@ -5,13 +5,13 @@ apply plugin: 'com.github.dcendents.android-maven'
 group='com.github.TurboMolot'
 android {
     compileSdkVersion 26
-    buildToolsVersion '26.0.2'
+    buildToolsVersion '26.0.3'
     defaultConfig {
 //        applicationId "ru.turbomolot.ntchart"
         minSdkVersion 18
         targetSdkVersion 26
         versionCode 1
-        versionName "0.0.14"
+        versionName "0.0.15"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {

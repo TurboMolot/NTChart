@@ -109,6 +109,7 @@ public class NTChart extends TextureView implements TextureView.SurfaceTextureLi
     @Override
     public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
         ntChartHolder.appBackground();
+        surface.release();
         this.surface.set(null);
         return true;
     }

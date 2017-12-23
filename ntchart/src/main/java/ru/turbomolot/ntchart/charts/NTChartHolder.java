@@ -35,6 +35,7 @@ import ru.turbomolot.ntchart.utils.ThreadRenderInvoker;
  */
 
 public class NTChartHolder {
+    private final static String TAG = "[NTChartHolder]";
     private final WeakReference<NTChart> wChart;
     private WeakReference<Surface> wSurfaceRender;
     private final AtomicBoolean surfaceChanged = new AtomicBoolean(false);
@@ -75,7 +76,7 @@ public class NTChartHolder {
             } catch (InterruptedException e) {
                 // skip
             } catch (Exception ex) {
-                Log.w("[NTChartHolder]", ex);
+                Log.w(TAG, ex);
             }
         }
     });
@@ -245,8 +246,11 @@ public class NTChartHolder {
         if (series.isEmpty() || holderMap == null)
             return;
         final Surface surfaceRender = (wSurfaceRender != null) ? wSurfaceRender.get() : null;
-        if (surfaceRender == null)
+        if (surfaceRender == null || !surfaceRender.isValid()) {
+//            Log.d(TAG, "[surfaceRender]: " +
+//                    (surfaceRender == null ? "null" : "not valid"));
             return;
+        }
         Canvas canvas;
         synchronized (surfaceSizeLock) {
             canvas = surfaceRender.lockCanvas(surfaceSize);

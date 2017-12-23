@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 import ru.turbomolot.ntchart.data.DataList;
 import ru.turbomolot.ntchart.render.ISeriesHolder;
@@ -17,10 +18,19 @@ import ru.turbomolot.ntchart.series.ISeries;
 
 public class ThreadCalcParam {
 
-    private final ExecutorService es = Executors.newFixedThreadPool(10);
+    private final ExecutorService es;// = Executors.newFixedThreadPool(10);
     private final List<TaskItem> taskList = new DataList<>();
     private final Object taskListLock = new Object();
+
     public ThreadCalcParam() {
+        es = Executors.newFixedThreadPool(10, new ThreadFactory() {
+            @Override
+            public Thread newThread(Runnable r) {
+                Thread th = new Thread(r);
+                th.setName("ThCalcParam");
+                return th;
+            }
+        });
     }
 
     public void addTask(TaskItem task) {
@@ -43,9 +53,9 @@ public class ThreadCalcParam {
         private final ISeriesHolder holder;
 
         public TaskItem(ISeries series, ISeriesHolder holder) {
-            if(series == null)
+            if (series == null)
                 throw new NullPointerException("series can not be null");
-            if(holder == null)
+            if (holder == null)
                 throw new NullPointerException("holder can not be null");
             this.series = series;
             this.holder = holder;
@@ -57,8 +67,9 @@ public class ThreadCalcParam {
             return null;
         }
     }
+
     public void stop() {
-        if(!es.isShutdown() && !es.isTerminated()) {
+        if (!es.isShutdown() && !es.isTerminated()) {
             es.shutdownNow();
         }
     }

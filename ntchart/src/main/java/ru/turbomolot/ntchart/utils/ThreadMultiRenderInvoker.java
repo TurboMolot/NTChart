@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 import ru.turbomolot.ntchart.data.DataList;
 import ru.turbomolot.ntchart.render.ISeriesHolder;
@@ -20,10 +21,19 @@ import ru.turbomolot.ntchart.series.ISeries;
  */
 
 public class ThreadMultiRenderInvoker {
-    private final ExecutorService es = Executors.newFixedThreadPool(10);
+    private final ExecutorService es;// = Executors.newFixedThreadPool(10);
     private final List<TaskRender> taskList = new DataList<>();
     private final Object taskListLock = new Object();
+
     public ThreadMultiRenderInvoker() {
+        es = Executors.newFixedThreadPool(10, new ThreadFactory() {
+            @Override
+            public Thread newThread(Runnable r) {
+                Thread th = new Thread(r);
+                th.setName("ThreadCalcParam");
+                return th;
+            }
+        });
     }
 
     public void addTask(TaskRender task) {
@@ -48,13 +58,13 @@ public class ThreadMultiRenderInvoker {
         private final Picture picture;
 
         public TaskRender(ISeries series, Picture picture, ISeriesHolder holder, Map<ISeries, ISeriesHolder> holders) {
-            if(series == null)
+            if (series == null)
                 throw new NullPointerException("series can not be null");
-            if(holder == null)
+            if (holder == null)
                 throw new NullPointerException("holder can not be null");
-            if(holders == null)
+            if (holders == null)
                 throw new NullPointerException("holders can not be null");
-            if(picture == null)
+            if (picture == null)
                 throw new NullPointerException("picture can not be null");
             this.series = series;
             this.holder = holder;
@@ -66,7 +76,7 @@ public class ThreadMultiRenderInvoker {
         @SuppressWarnings("unchecked")
         public Void call() throws Exception {
             RectF wndSize = holder.getWindowSize();
-            Canvas canvas = picture.beginRecording((int) wndSize.right, (int)wndSize.bottom);
+            Canvas canvas = picture.beginRecording((int) wndSize.right, (int) wndSize.bottom);
             series.render(canvas, holder, holders);
             picture.endRecording();
             return null;
