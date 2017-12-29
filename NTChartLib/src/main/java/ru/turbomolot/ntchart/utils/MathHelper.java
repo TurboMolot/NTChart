@@ -1,5 +1,7 @@
 package ru.turbomolot.ntchart.utils;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -61,10 +63,16 @@ public class MathHelper {
     }
 
     public static <P extends IPoint2D> P absScalePoint(final FrameRender<P> frame, final P point,
-                                                        float xOffset,
-                                                        float yOffset, float h) {
+                                                       float xOffset,
+                                                       float yOffset, float h) {
         P itm = point.copy();
         itm.setX((itm.getX() + xOffset) * frame.getScaleX());
+
+//        float hPoint = (frame.getPointYMax().getY() - frame.getPointYMin().getY());
+//        float flipY = itm.getY() - hPoint;
+
+//        itm.setY(flipY * frame.getScaleY());
+
         itm.setY(h - ((itm.getY() + yOffset) * frame.getScaleY()));
 //        itm.setY(((itm.getY() + yOffset) * frame.getScaleY()));
         return itm;
@@ -154,9 +162,6 @@ public class MathHelper {
                 itmAbs = absScalePoint(frame, ptMin, xOffset, yOffset, height);
                 idxPlain = addPtsPlain(ptsRetPlain, itmAbs, idxPlain);
                 ptsRet.add(itmAbs);
-
-//                ptsRet.add(absScalePoint(frame, ptMax, xOffset, yOffset));
-//                ptsRet.add(absScalePoint(frame, ptMin, xOffset, yOffset));
             }
         }
         frame.setPointsPlain(Arrays.copyOf(ptsRetPlain, idxPlain));
@@ -371,7 +376,7 @@ public class MathHelper {
         private double dy;
         private double sxey;
         private double exsy;
-        private  double length;
+        private double length;
 
         public Line(P start, P end) {
             this.start = start;
@@ -380,7 +385,7 @@ public class MathHelper {
             dy = start.getY() - end.getY();
             sxey = start.getX() * end.getY();
             exsy = end.getX() * start.getY();
-            length = Math.sqrt(dx*dx + dy*dy);
+            length = Math.sqrt(dx * dx + dy * dy);
         }
 
         @SuppressWarnings("unchecked")
@@ -393,16 +398,15 @@ public class MathHelper {
                     dx * p.getY() + sxey - exsy) / length;
         }
     }
+
     /**
      * Reduces number of points in given series using Ramer-Douglas-Peucker algorithm.
      *
-     * @param points
-     *          initial, ordered list of points (objects implementing the {@link IPoint2D} interface)
-     * @param epsilon
-     *          allowed margin of the resulting curve, has to be > 0
+     * @param points  initial, ordered list of points (objects implementing the {@link IPoint2D} interface)
+     * @param epsilon allowed margin of the resulting curve, has to be > 0
      */
     public static <P extends IPoint2D> List<P> reducePts(List<P> points, float epsilon) {
-        if(points == null || points.isEmpty())
+        if (points == null || points.isEmpty())
             return points;
         if (epsilon < 0) {
             throw new IllegalArgumentException("Epsilon cannot be less then 0.");
@@ -412,13 +416,13 @@ public class MathHelper {
         Line<P> line = new Line<P>(points.get(0), points.get(points.size() - 1));
         for (int i = 1; i < points.size() - 1; i++) {
             double distance = line.distance(points.get(i));
-            if (distance > furthestPointDistance ) {
+            if (distance > furthestPointDistance) {
                 furthestPointDistance = distance;
                 furthestPointIndex = i;
             }
         }
         if (furthestPointDistance > epsilon) {
-            List<P> reduced1 = reducePts(points.subList(0, furthestPointIndex+1), epsilon);
+            List<P> reduced1 = reducePts(points.subList(0, furthestPointIndex + 1), epsilon);
             List<P> reduced2 = reducePts(points.subList(furthestPointIndex, points.size()), epsilon);
             List<P> result = new CopyOnWriteArrayList<>(reduced1);
             result.addAll(reduced2.subList(1, reduced2.size()));
@@ -429,13 +433,13 @@ public class MathHelper {
     }
 
     public static <P extends IPoint2D> List<P> reducePtsNative(List<P> points, float epsilon) {
-        if(points == null || points.isEmpty())
+        if (points == null || points.isEmpty())
             return points;
         if (epsilon < 0) {
             throw new IllegalArgumentException("Epsilon cannot be less then 0.");
         }
         float[] ptsRes = nReduceListOrderedX(points, epsilon);
-        if(ptsRes != null && ptsRes.length > 0 && ptsRes.length % 2 == 0) {
+        if (ptsRes != null && ptsRes.length > 0 && ptsRes.length % 2 == 0) {
             int len = ptsRes.length >> 1;
             int idx = 0;
             List<IPoint2D> retList = new CopyOnWriteArrayList<>();

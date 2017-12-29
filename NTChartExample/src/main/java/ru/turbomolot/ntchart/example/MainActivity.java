@@ -34,11 +34,14 @@ public class MainActivity extends AppCompatActivity {
         if (chart == null)
             return;
         seriesLine1 = new SeriesLineM();
-        ((SeriesLineM) seriesLine1).setMaxDistanceStore(16f);
+        ((SeriesLineM) seriesLine1).setMaxDistanceStore((float)(4d * Math.PI * 40d));
+        ((SeriesLineM) seriesLine1).setMaxDistanceX((float)(Math.PI * 20d));
 //        seriesLine2 = new SeriesLine();
         chart.addSeries(seriesLine1);
-        seriesLine1.setMinY(-1f);
-        seriesLine1.setMaxY(1f);
+
+//        seriesLine1.setMinY(-12f);
+//        seriesLine1.setMaxY(12f);
+
 //        chart.addSeries(seriesLine2);
         Thread thread = new Thread(new Runnable() {
             @Override
@@ -52,34 +55,32 @@ public class MainActivity extends AppCompatActivity {
 
     private void processSin() {
         float time = 0;
-        float dx = 0.01f;
+        float dx = 0.02f;
 //        long curTime = System.currentTimeMillis();
 //        long lastTime = curTime;
         float y;
         try {
-            EcgParameters ecgParam = new EcgParameters();
-            EcgCalc ecgCalc = new EcgCalc(ecgParam);
-            EcgCalc.Generator generator = ecgCalc.calculateEcg();
+//            EcgParameters ecgParam = new EcgParameters();
+//            EcgCalc ecgCalc = new EcgCalc(ecgParam);
+//            EcgCalc.Generator generator = ecgCalc.calculateEcg();
 
             FPSHelper fpsHelper = new FPSHelper();
             fpsHelper.setNormalFPS(24);
             List<Point2D> pts = new ArrayList<>();
-//            for(int i=0; i < 10_000; i++) {
-//                y = 10 * (float) Math.sin(time);
-//                pts.add(new Point2D(time, y));
-//                time += dx;
-//            }
             seriesLine1.addPoints(pts);
 
             while (!Thread.interrupted()) {
                 fpsHelper.sleepNormal();
                 int cnt = 10;
                 while (--cnt >= 0) {
-                    EcgCalc.EcgMeasurement pt = generator.next();
-                    pts.add(new Point2D((float) pt.getTime(), (float) pt.getVoltage()));
-//                    y = 10 * (float) Math.sin(time);
-//                    pts.add(new Point2D(time, y));
-//                    time += dx;
+//                    EcgCalc.EcgMeasurement pt = generator.next();
+//                    pts.add(new Point2D((float) pt.getTime(), (float) pt.getVoltage()));
+                    y = 10 * (float) Math.sin(time);
+                    if(y > 0) {
+                        y = y + (float)(2d * Math.random());
+                    }
+                    pts.add(new Point2D(time, y));
+                    time += dx;
                 }
                 seriesLine1.addPoints(pts);
                 pts.clear();

@@ -190,12 +190,16 @@ public class SeriesLineM implements ISeries<Point2D> {
             frame.setPointYMax(minMaxPoint2D.getMaxY());
             frame.setMinMaxPoint(minMaxPoint2D);
 
-             frame.setMinY(getMinY());
+            frame.setMinY(getMinY());
             frame.setMaxY(getMaxY());
 
             float valRange = Math.abs(pts.get(idxTo).getX() - pts.get(idxFrom).getX());
             frame.setScaleX(rWidth / ((rX > 0) ? rX : valRange));
-            valRange = Math.abs(minMaxPoint2D.getMaxY().getY() - minMaxPoint2D.getMinY().getY());
+
+
+            float maxForScY = (frame.getMaxY() != null) ? frame.getMaxY() : minMaxPoint2D.getMaxY().getY();
+            float minForScY = (frame.getMinY() != null) ? frame.getMinY() : minMaxPoint2D.getMinY().getY();
+            valRange = Math.abs(maxForScY - minForScY);
             frame.setScaleY(rHeight / ((valRange != 0f) ? valRange : 1f));
 
             frame.setPoints(pts.subList(idxFrom, idxTo));
@@ -374,6 +378,7 @@ public class SeriesLineM implements ISeries<Point2D> {
                 || (old != null && minX == null)
                 || (old != null && !minX.equals(old))) {
             this.minX.lazySet(minX);
+            notifyUpdate();
         }
     }
 
@@ -389,6 +394,7 @@ public class SeriesLineM implements ISeries<Point2D> {
                 || (old != null && minY == null)
                 || (old != null && !minY.equals(old))) {
             this.minY.lazySet(minY);
+            notifyUpdate();
         }
     }
 
@@ -404,6 +410,7 @@ public class SeriesLineM implements ISeries<Point2D> {
                 || (old != null && maxX == null)
                 || (old != null && !maxX.equals(old))) {
             this.maxX.lazySet(maxX);
+            notifyUpdate();
         }
     }
 
@@ -419,6 +426,7 @@ public class SeriesLineM implements ISeries<Point2D> {
                 || (old != null && maxY == null)
                 || (old != null && !maxY.equals(old))) {
             this.maxY.lazySet(maxY);
+            notifyUpdate();
         }
     }
 
@@ -431,6 +439,20 @@ public class SeriesLineM implements ISeries<Point2D> {
     public RectF getRenderPosition() {
         RectF pos = positionInChart;
         return pos != null ? new RectF(pos) : null;
+    }
+
+    public Float getMaxDistanceX() {
+        return rangeX.get();
+    }
+
+    public void setMaxDistanceX(Float maxDistanceX) {
+        Float old = getMaxDistanceX();
+        if((old == null && maxDistanceX != null)
+                || (old != null && maxDistanceX == null)
+                || (old != null && !maxDistanceX.equals(old))) {
+            this.rangeX.lazySet(maxDistanceX);
+            notifyUpdate();
+        }
     }
 
     public Paint getLinePaint() {
