@@ -8,7 +8,8 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/ntchart" />
+            <option value="$PROJECT_DIR$/NTChartExample" />
+            <option value="$PROJECT_DIR$/NTChartLib" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

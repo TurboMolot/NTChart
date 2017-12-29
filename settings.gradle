@@ -1,1 +1,1 @@
-include ':ntchart'
+include ':NTChartExample', ':NTChartLib'

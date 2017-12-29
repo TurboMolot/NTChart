@@ -3,7 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/NTChart.iml" filepath="$PROJECT_DIR$/NTChart.iml" />
-      <module fileurl="file://$PROJECT_DIR$/ntchart/ntchart.iml" filepath="$PROJECT_DIR$/ntchart/ntchart.iml" />
+      <module fileurl="file://$PROJECT_DIR$/NTChartExample/NTChartExample.iml" filepath="$PROJECT_DIR$/NTChartExample/NTChartExample.iml" />
+      <module fileurl="file://$PROJECT_DIR$/NTChartLib/NTChartLib.iml" filepath="$PROJECT_DIR$/NTChartLib/NTChartLib.iml" />
     </modules>
   </component>
 </project>
